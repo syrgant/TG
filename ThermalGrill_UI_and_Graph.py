@@ -19,12 +19,37 @@ style.use("ggplot")
 
 root = Tk()
 
+root.geometry("600x600")
+
+#make frames for maneagement
+buttonFrame = Frame(root)
+graphFrame = Frame(root)
+buttonFrame.pack(side=TOP)
+graphFrame.pack(side=BOTTOM)
+
+aEntry = Entry(buttonFrame)
+bEntry = Entry(buttonFrame)
+aEntry.grid(row=1, column=0)
+bEntry.grid(row=1, column=3)
+
+global desiredA
+global desiredB
+
+desiredA = queue.Queue()
+desiredB = queue.Queue()
+
+global setA
+global setB
+
+Label(buttonFrame, text="Set Desired 'A' Value").grid(row=0, column=0)
+Label(buttonFrame, text="Set Desired 'B' Value").grid(row=0, column=3)
+
 f = Figure(figsize=(10,8), dpi=100)
 a = f.add_subplot(111)
 a.set(ylim=(0, 50), xlim=(0, 25))
 a.autoscale(enable=False, axis='x')
 
-canvas = FigureCanvasTkAgg(f, root)
+canvas = FigureCanvasTkAgg(f, graphFrame)
 canvas.draw()
 canvas.get_tk_widget().pack()
 
@@ -36,7 +61,7 @@ except:
 global serc
 
 try:
-    print(serc.get(timeout=1))
+    print(serc.get(timeout=0))
 except:
     serc = queue.Queue()
     serc.put(ser)
@@ -69,12 +94,15 @@ for port in sorted(ports):
 serialTkvar = StringVar(root)
 
 #set default value
-#serialTkvar.set(PortsAvailableArray[0])
+try:
+    serialTkvar.set(PortsAvailableArray[0])
+except:
+    pass
 
 #make drop down and label
-portsMenu = OptionMenu(root, serialTkvar, *PortsAvailableArray)
-portsMenu.pack(side=RIGHT)
-Label(text="Choose a port").pack(side=RIGHT)
+portsMenu = OptionMenu(buttonFrame, serialTkvar, *PortsAvailableArray)
+portsMenu.grid(row=2, column=2)
+Label(buttonFrame, text="Choose a port").grid(row=2, column=1)
 
 #what happens when you change selection
 def change_port(*args):
@@ -88,7 +116,7 @@ def start_graph():
     ser = serial.Serial(
         port = serialTkvar.get(),
         baudrate = 9600,
-        timeout = 1,
+        timeout = 0,
         xonxoff = False,     #disable software flow control
         rtscts = True,     #disable hardware (RTS/CTS) flow control
         dsrdtr = True,       #disable hardware (DSR/DTR) flow control
@@ -97,20 +125,40 @@ def start_graph():
     print("starting")
     serc.put(ser)
 
+#program to make the numbers 4 digits
+
+def four_dig(input):
+    # convert temp into Arduino  command.
+    # Arduino ranges from 0V - 0 to 5V - 4094. Every volt is 10 degrees
+    if input > 49:
+        input = 49
+    input1 = input * 82
+    input1 = str(input1)
+    if (len(input1)==1):
+        return "000" + input1
+    elif (len(input1)==2):
+        return "00" + input1
+    elif (len(input1)==3):
+        return "0" + input1
+    elif (len(input1)==4):
+        return input1
+    else:
+        return -1
+
 #make start button
-startButton = Button(text="Start", command=start_graph)
-startButton.pack(side=LEFT)
+startButton = Button(buttonFrame, text="Start", command=start_graph)
+startButton.grid(row=2, column=0)
 
 def animate(i):
     a.autoscale(enable=False, axis='x')
     try:
-        serialConnection = serc.get(timeout=1)
+        serialConnection = serc.get(timeout=0)
         serc.put(serialConnection)
-        for x in range(2):
+        for r in range(2):
             #get string from serial connection
             s = str(serialConnection.readline())
             #truncate to just the actual output
-            x = s[2:6]
+            x = s[2:9]
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
                 AVals.append(float(x[2:6]))
@@ -121,7 +169,9 @@ def animate(i):
             #get string from serial connection
             s = str(serialConnection.readline())
             #truncate to just the actual output
-            x = s[2:6]
+
+            x = s[2:9]
+
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
                 AVals.append(float(x[2:6]))
@@ -139,7 +189,44 @@ def animate(i):
     except:
         pass
 
+    try:
+        setB = desiredB.get(timeout=0)
+        desiredB.put(setB)
+    except:
+        pass
 
-ani = animation.FuncAnimation(f,animate, interval=200)
+    try:
+        setA = desiredA.get(timeout=0)
+        desiredA.put(setA)
+    except:
+        pass
+
+    try:
+        aOut = float(setA)
+        bOut = float(setB)
+
+        aOut = four_dig(aOut)
+        bOut = four_dig(bOut)
+
+        out = str(aOut) + str(bOut)
+        out = out.encode('utf-8')
+        print('Sending Output: ', out)
+    except Exception as e:
+        print(e)
+#wait for someone to press enter to change the desired temperatures
+
+def changedA(event=None):
+    with desiredA.mutex:
+        desiredA.queue.clear()
+    desiredA.put(aEntry.get())
+
+def changedB(event=None):
+    with desiredB.mutex:
+        desiredB.queue.clear()
+    desiredB.put(bEntry.get())
+
+aEntry.bind('<Return>', changedA)
+bEntry.bind('<Return>', changedB)
+
+ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
-

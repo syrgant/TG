@@ -202,17 +202,17 @@ def animate(i):
         pass
 
     try:
-        aOut = float(setA)
-        bOut = float(setB)
+        aOut = int(setA)
+        bOut = int(setB)
 
         aOut = four_dig(aOut)
         bOut = four_dig(bOut)
 
-        out = str(aOut) + str(bOut)
+        out = aOut + bOut
         out = out.encode('utf-8')
         print('Sending Output: ', out)
-    except Exception as e:
-        print(e)
+    except:
+        pass
 #wait for someone to press enter to change the desired temperatures
 
 def changedA(event=None):
@@ -230,3 +230,4 @@ bEntry.bind('<Return>', changedB)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
+

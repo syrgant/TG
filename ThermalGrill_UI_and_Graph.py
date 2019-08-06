@@ -35,6 +35,12 @@ bEntry.grid(row=1, column=3)
 global desiredA
 global desiredB
 
+global globOut
+try:
+    print(globOut.get(timeout=0))
+except:
+    globOut = queue.Queue()
+
 desiredA = queue.Queue()
 desiredB = queue.Queue()
 
@@ -207,12 +213,38 @@ def animate(i):
 
         aOut = four_dig(aOut)
         bOut = four_dig(bOut)
-
-        out = aOut + bOut
-        out = out.encode('utf-8')
-        print('Sending Output: ', out)
     except:
         pass
+
+    try:
+        out = globOut.get(timeout=0)
+    except Exception as e:
+        print(str(e))
+        out = None
+
+    try:
+        preOut = aOut + bOut
+        #print(out)
+
+        preOut = preOut.encode('utf-8')
+        #print(str(preOut) + ", " + str(out))
+        if preOut == out:
+            globOut.put(preOut)
+        else:
+            out = aOut + bOut
+            out = out.encode('utf-8')
+            globOut.put(out)
+            print('Sending Output: ', out)
+            serialConnection.write(out)
+    except Exception as e:
+        #print(e)
+        '''
+        if "out" in e:
+            out = aOut + bOut
+            out = out.encode('utf-8')
+            #globOut.put(out)
+            print('Sending Output: ', out)
+        '''
 #wait for someone to press enter to change the desired temperatures
 
 def changedA(event=None):

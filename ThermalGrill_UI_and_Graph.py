@@ -17,6 +17,29 @@ import queue
 from matplotlib import style
 style.use("ggplot")
 
+#get the calibrated equation from the file
+global aCal
+global bCal
+global cCal
+
+try:
+    f = open("CalibratedValues.txt", "r")
+    lines = f.readlines()
+
+    aCal = float((lines[0])[0:6])
+    bCal = float((lines[1])[0:6])
+    cCal = float((lines[2])[0:6])
+except:
+    print("no calibration file found, using given values")
+    aCal = 0
+    bCal = 1
+    cCal = 0
+
+#print the calibrated values fr0m the file
+print(aCal)
+print(bCal)
+print(cCal)
+
 root = Tk()
 
 root.geometry("600x600")
@@ -167,9 +190,11 @@ def animate(i):
             x = s[2:9]
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
-                AVals.append(float(x[2:6]))
+                newVal = aCal*(float(x[2:6])) + bCal*(float(x[2:6])) + cCal
+                AVals.append(newVal)
             elif x[0] == 'B':
-                BVals.append(float(x[2:6]))
+                newVal = aCal*(float(x[2:6])) + bCal*(float(x[2:6])) + cCal
+                BVals.append(newVal)
 
         while not len(AVals) == len(BVals):
             #get string from serial connection
@@ -262,4 +287,3 @@ bEntry.bind('<Return>', changedB)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
-

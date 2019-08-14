@@ -5,6 +5,9 @@ import serial
 import serial.tools.list_ports
 import time
 
+#make or edit config file
+f = open("CalibratedValues.txt","w+")
+
 ports = serial.tools.list_ports.comports()
 
 PortsAvailable = []
@@ -31,6 +34,8 @@ print(PortsAvailablePrintable)
 
 connectingPortID = input("Please type the number of the port you would like to use: ")
 connectingPort = PortsAvailable[int(connectingPortID)]
+#write the wanted port to the config file
+f.write(str(connectingPortID) + "\n")
 
 ser = serial.Serial(
     port = connectingPort,
@@ -133,9 +138,9 @@ m.solve(disp=False)
 print(a.Value[0])
 print(b.Value[0])
 print(c.Value[0])
-
-f = open("CalibratedValues.txt","w+")
-
+#write the equation vars to config file
 f.write(str(a.Value[0]) + "\n")
 f.write(str(b.Value[0]) + "\n")
 f.write(str(c.Value[0]) + "\n")
+
+f.close()

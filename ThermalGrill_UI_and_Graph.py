@@ -1,3 +1,5 @@
+import os
+import subprocess
 import serial
 import time
 import datetime
@@ -26,11 +28,11 @@ try:
     f = open("CalibratedValues.txt", "r")
     lines = f.readlines()
 
-    aCal = float((lines[0])[0:6])
-    bCal = float((lines[1])[0:6])
-    cCal = float((lines[2])[0:6])
+    aCal = float((lines[1])[0:6])
+    bCal = float((lines[2])[0:6])
+    cCal = float((lines[3])[0:6])
 except:
-    print("no calibration file found, using given values")
+    print("no calibration file found, using default values")
     aCal = 0
     bCal = 1
     cCal = 0
@@ -50,14 +52,16 @@ graphFrame = Frame(root)
 buttonFrame.pack(side=TOP)
 graphFrame.pack(side=BOTTOM)
 
+#make entry boxes
 aEntry = Entry(buttonFrame)
 bEntry = Entry(buttonFrame)
 aEntry.grid(row=1, column=0)
-bEntry.grid(row=1, column=3)
+bEntry.grid(row=1, column=2)
 
 global desiredA
 global desiredB
 
+#define functions to get last V sent and not repeat if same
 global globOut
 try:
     print(globOut.get(timeout=0))
@@ -71,8 +75,9 @@ global setA
 global setB
 
 Label(buttonFrame, text="Set Desired 'A' Value").grid(row=0, column=0)
-Label(buttonFrame, text="Set Desired 'B' Value").grid(row=0, column=3)
+Label(buttonFrame, text="Set Desired 'B' Value").grid(row=0, column=2)
 
+#define the graph
 f = Figure(figsize=(10,8), dpi=100)
 a = f.add_subplot(111)
 a.set(ylim=(0, 50), xlim=(0, 25))
@@ -82,6 +87,7 @@ canvas = FigureCanvasTkAgg(f, graphFrame)
 canvas.draw()
 canvas.get_tk_widget().pack()
 
+#deal with serial connection queues
 try:
     print(ser)
 except:
@@ -124,7 +130,7 @@ serialTkvar = StringVar(root)
 
 #set default value
 try:
-    serialTkvar.set(PortsAvailableArray[0])
+    serialTkvar.set(PortsAvailableArray[int(lines[0])])
 except:
     pass
 
@@ -177,6 +183,23 @@ def four_dig(input):
 #make start button
 startButton = Button(buttonFrame, text="Start", command=start_graph)
 startButton.grid(row=2, column=0)
+
+#function to restart the restart program
+def resetProgram():
+    os.execl(sys.executable, sys.executable, *sys.argv)
+
+#make reset button
+resetButton = Button(buttonFrame, text="Reset", command=resetProgram)
+resetButton.grid(row=3, column=1)
+
+#execute the calibrate script in a terminal
+def Calibrate():
+    #subprocess.call(["python3", "Calibrate.py"])
+    os.system("python3 Calibrate.py")
+
+#make calibrate button
+calibrateButton = Button(buttonFrame, text="Calibrate", command=Calibrate)
+calibrateButton.grid(row=1, column=1)
 
 def animate(i):
     a.autoscale(enable=False, axis='x')
@@ -244,7 +267,7 @@ def animate(i):
     try:
         out = globOut.get(timeout=0)
     except Exception as e:
-        print(str(e))
+        #print(str(e))
         out = None
 
     try:
@@ -287,3 +310,4 @@ bEntry.bind('<Return>', changedB)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
+

@@ -47,72 +47,22 @@ ser = serial.Serial(
     writeTimeout = 2
 )
 
-xm = np.array([])
-
 yVal1 = input('Please manually set to new temperature, then input what is displayed on device after stabilization: ')
-ser.flushInput()
-time.sleep(0.5)
-foundVal = False
-while foundVal == False:
-    s = str(ser.readline())
-    #truncate to just the actual output
-    x = s[2:9]
-    #check to see if it's an A or B value, and append to correct dictionary
-    if x[0] == 'A':
-        np.append(xm, float(x[2:6]))
-        foundVal = True
-    elif x[0] == 'B':
-        foundVal = False
+xVal1 = input('Type what is being sent over serial: ')
 
 yVal2 = input('Please manually set to new temperature, then input what is displayed on device after stabilization: ')
-ser.flushInput()
-time.sleep(0.5)
-foundVal = False
-while foundVal == False:
-    s = str(ser.readline())
-    #truncate to just the actual output
-    x = s[2:9]
-    #check to see if it's an A or B value, and append to correct dictionary
-    if x[0] == 'A':
-        np.append(xm, float(x[2:6]))
-        foundVal = True
-    elif x[0] == 'B':
-        foundVal = False
+xVal2 = input('Type what is being sent over serial: ')
 
 yVal3 = input('Please manually set to new temperature, then input what is displayed on device after stabilization: ')
-ser.flushInput()
-time.sleep(0.5)
-foundVal = False
-while foundVal == False:
-    s = str(ser.readline())
-    #truncate to just the actual output
-    x = s[2:9]
-    #check to see if it's an A or B value, and append to correct dictionary
-    if x[0] == 'A':
-        np.append(xm, float(x[2:6]))
-        foundVal = True
-    elif x[0] == 'B':
-        foundVal = False
+xVal3 = input('Type what is being sent over serial: ')
 
 yVal4 = input('Please manually set to new temperature, then input what is displayed on device after stabilization: ')
-ser.flushInput()
-time.sleep(0.5)
-foundVal = False
-while foundVal == False:
-    s = str(ser.readline())
-    #truncate to just the actual output
-    x = s[2:9]
-    #check to see if it's an A or B value, and append to correct dictionary
-    if x[0] == 'A':
-        np.append(xm, float(x[2:6]))
-        foundVal = True
-    elif x[0] == 'B':
-        foundVal = False
-
-
-print(xm)
+xVal4 = input('Type what is being sent over serial: ')
 
 ym = np.array([yVal1, yVal2, yVal3, yVal4])
+xm = np.array([xVal1, xVal2, xVal3, xVal4])
+
+print(xm)
 
 m = GEKKO()
 
@@ -144,3 +94,4 @@ f.write(str(b.Value[0]) + "\n")
 f.write(str(c.Value[0]) + "\n")
 
 f.close()
+

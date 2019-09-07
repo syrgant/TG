@@ -35,6 +35,7 @@ try:
     aCal = float((lines[1])[0:6])
     bCal = float((lines[2])[0:6])
     cCal = float((lines[3])[0:6])
+    avg = float(lines[4])
 
     calFile.close()
 except:
@@ -158,9 +159,9 @@ averageTkvar = StringVar(root)
 
 #set the default value
 try:
-    averageTkvar.set(PortsAvailableArray[int(lines[4])])
-except:
-    pass
+    averageTkvar.set(avg)
+except Exception as e:
+    print(e)
 
 #make dropdown and label
 averageMenu = OptionMenu(graphFrame, averageTkvar, *averageArray)
@@ -171,7 +172,12 @@ Label(graphFrame, text="Number of Prev. Values for Average").grid(row=2, column=
 def change_av(*args):
     print( averageTkvar.get() )
     calFile = open("CalibratedValues.txt", "w")
-    calFile.write(averageTkvar.get() + "\n")
+    try:
+        lines[4] = (str(averageTkvar.get()) + "\n")
+    except:
+        lines.append(str(averageTkvar.get()) + "\n")
+    #calFile.write(averageTkvar.get() + "\n")
+    calFile.writelines(lines)
     calFile.close()
     #pass
 
@@ -344,3 +350,4 @@ bEntry.bind('<Return>', changedB)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
+

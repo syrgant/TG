@@ -24,13 +24,20 @@ global aCal
 global bCal
 global cCal
 
+averageArray = [0, 1, 2, 3, 4, 5]
+
+#calFile = open("CalibratedValues.txt", "r")
+
 try:
-    f = open("CalibratedValues.txt", "r")
-    lines = f.readlines()
+    calFile = open("CalibratedValues.txt", "r")
+    lines = calFile.readlines()
 
     aCal = float((lines[1])[0:6])
     bCal = float((lines[2])[0:6])
     cCal = float((lines[3])[0:6])
+    avg = float(lines[4])
+
+    calFile.close()
 except:
     print("no calibration file found, using default values")
     aCal = 0
@@ -42,9 +49,12 @@ print(aCal)
 print(bCal)
 print(cCal)
 
+global avgNum
+avgNum = queue.Queue()
+
 root = Tk()
 
-root.geometry("600x600")
+root.geometry("600x670")
 
 #make frames for maneagement
 buttonFrame = Frame(root)
@@ -78,14 +88,14 @@ Label(buttonFrame, text="Set Desired 'A' Value").grid(row=0, column=0)
 Label(buttonFrame, text="Set Desired 'B' Value").grid(row=0, column=2)
 
 #define the graph
-f = Figure(figsize=(10,8), dpi=100)
+f = Figure(figsize=(5,5), dpi=100)
 a = f.add_subplot(111)
 a.set(ylim=(0, 50), xlim=(0, 25))
 a.autoscale(enable=False, axis='x')
 
 canvas = FigureCanvasTkAgg(f, graphFrame)
 canvas.draw()
-canvas.get_tk_widget().pack()
+canvas.get_tk_widget().grid(row=0, column=0)
 
 #deal with serial connection queues
 try:
@@ -141,10 +151,48 @@ Label(buttonFrame, text="Choose a port").grid(row=2, column=1)
 
 #what happens when you change selection
 def change_port(*args):
-    print( serialTkvar.get() )
+    #print( serialTkvar.get() )
+    pass
 
 #link dropdown to change function
 serialTkvar.trace('w', change_port)
+
+                                        #Make the averaging dropdown
+averageTkvar = StringVar(root)
+
+#set the default value
+try:
+    averageTkvar.set(avg)
+except Exception as e:
+    print(e)
+
+#make dropdown and label
+averageMenu = OptionMenu(graphFrame, averageTkvar, *averageArray)
+averageMenu.grid(row=3, column=0)
+Label(graphFrame, text="Number of Prev. Values for Average").grid(row=2, column=0)
+
+#what happens when you change selection
+def change_av(*args):
+    print( averageTkvar.get() )
+    calFile = open("CalibratedValues.txt", "w")
+    try:
+        lines[4] = (str(averageTkvar.get()) + "\n")
+    except:
+        lines.append(str(averageTkvar.get()) + "\n")
+
+    try:
+        avgNum.get(timeout=0)
+    except:
+        pass
+
+    avgNum.put(averageTkvar.get())
+    #calFile.write(averageTkvar.get() + "\n")
+    calFile.writelines(lines)
+    calFile.close()
+    #pass
+
+#link dropdown to change function
+averageTkvar.trace('w', change_av)
 
 
 def start_graph():
@@ -202,6 +250,11 @@ calibrateButton = Button(buttonFrame, text="Calibrate", command=Calibrate)
 calibrateButton.grid(row=1, column=1)
 
 def animate(i):
+    try:
+        avgNum2 = avgNum.get(timeout=0)
+    except:
+        pass
+
     a.autoscale(enable=False, axis='x')
     try:
         serialConnection = serc.get(timeout=0)
@@ -213,10 +266,31 @@ def animate(i):
             x = s[2:9]
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
-                newVal = aCal*(float(x[2:6])) + bCal*(float(x[2:6])) + cCal
+                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                try:
+                    testNum = AVals[len(AVals)-i]
+                    getAvg = true
+                except:
+                    getAvg=false
+
+                if getAvg:
+                    for i in avgNum2:
+                        newVal = newVal + AVals[len(AVals)-i]
+                    newVal = newVal/avgNums2
+
                 AVals.append(newVal)
             elif x[0] == 'B':
-                newVal = aCal*(float(x[2:6])) + bCal*(float(x[2:6])) + cCal
+                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                try:
+                    testNum = BVals[len(BVals)-i]
+                    getAvg = true
+                except:
+                    getAvg=false
+
+                if getAvg:
+                    for i in avgNum2:
+                        newVal = newVal + BVals[len(BVals)-i]
+                    newVal = newVal/avgNums2
                 BVals.append(newVal)
 
         while not len(AVals) == len(BVals):
@@ -228,9 +302,11 @@ def animate(i):
 
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
-                AVals.append(float(x[2:6]))
+                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                AVals.append(newVal)
             elif x[0] == 'B':
-                BVals.append(float(x[2:6]))
+                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                BVals.append(newVal)
 
         a.clear()
         a.plot(AVals, "b")
@@ -310,4 +386,5 @@ bEntry.bind('<Return>', changedB)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
+
 

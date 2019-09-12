@@ -26,6 +26,8 @@ global cCal
 
 averageArray = [0, 1, 2, 3, 4, 5]
 
+global tempsChanged
+
 #calFile = open("CalibratedValues.txt", "r")
 
 try:
@@ -157,7 +159,7 @@ def change_port(*args):
 #link dropdown to change function
 serialTkvar.trace('w', change_port)
 
-                                        #Make the averaging dropdown
+                                    #Make the averaging dropdown
 averageTkvar = StringVar(root)
 
 #set the default value
@@ -194,6 +196,12 @@ def change_av(*args):
 #link dropdown to change function
 averageTkvar.trace('w', change_av)
 
+#make slider for the pain "levels"
+painVar = StringVar(root)
+
+painScale = Scale(buttonFrame, from_=0, to_=10, orient = 'horizontal', variable = painVar)
+painScale.grid(row=1, column=5)
+Label(buttonFrame, text="Pain Level").grid(row=0, column=5)
 
 def start_graph():
     ser = serial.Serial(
@@ -227,6 +235,25 @@ def four_dig(input):
         return input1
     else:
         return -1
+
+#set default temperatures
+
+try:
+    if tempsChanged == False:
+        desiredA.put(23)
+        desiredB.put(23)
+        tempsChanged = True
+except Exception as e:
+    #print(e)
+    tempsChanged = True
+    aEntry.delete(0, last=None)
+    bEntry.delete(0, last=None)
+
+    aEntry.insert(0, "23")
+    bEntry.insert(0, "23")
+
+    desiredA.put(23)
+    desiredB.put(23)
 
 #make start button
 startButton = Button(buttonFrame, text="Start", command=start_graph)
@@ -381,8 +408,23 @@ def changedB(event=None):
         desiredB.queue.clear()
     desiredB.put(bEntry.get())
 
+def sliderChanged(*args):
+    try:
+        aEntry.delete(0, "end")
+        bEntry.delete(0, "end")
+
+        aEntry.insert(0, str(23 + int(round(float(painVar.get())*(17/10)))))
+        bEntry.insert(0, str(23 - int(round(float(painVar.get())*(17/10)))))
+
+        changedA()
+        changedB()
+    except Exception as e:
+        print(e)
+
 aEntry.bind('<Return>', changedA)
 bEntry.bind('<Return>', changedB)
+
+painVar.trace('w', sliderChanged)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()

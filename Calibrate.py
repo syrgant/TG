@@ -11,12 +11,18 @@ root = Tk()
 root.geometry("600x400")
 
 #make or edit config file
-f = open("CalibratedValues.txt","r+")
 
-lines = f.readlines()
-print(lines)
+try:
+    f = open("CalibratedValues.txt","r+")
 
-f.close()
+    lines = f.readlines()
+    print(lines)
+    f.close()
+except:
+    f = open("CalibratedValues.txt","w+")
+    f.close()
+
+
 
 ports = serial.tools.list_ports.comports()
 
@@ -40,7 +46,7 @@ for port in sorted(ports):
     PortsAvailablePrintable.append(str(selPort) + ': ' + PortsAvailable[selPort])
     selPort += 1
 
-print(PortsAvailablePrintable)
+#print(PortsAvailablePrintable)
 
 root.grid_columnconfigure(2, weight=1)
 
@@ -52,49 +58,66 @@ root.grid_rowconfigure(9, weight=1)
                         #A Temps
 #Labels
 Label(root, text="A Temps").grid(row=0, column=1)
-Label(root, text="Sent Temp").grid(row=1, column=0)
+Label(root, text="Serial Temp").grid(row=1, column=0)
 Label(root, text="Actual Temp").grid(row=2, column=0)
-Label(root, text="Sent Temp").grid(row=4, column=0)
+Label(root, text="Serial Temp").grid(row=4, column=0)
 Label(root, text="Actual Temp").grid(row=5, column=0)
-Label(root, text="Sent Temp").grid(row=7, column=0)
+Label(root, text="Serial Temp").grid(row=7, column=0)
 Label(root, text="Actual Temp").grid(row=8, column=0)
-Label(root, text="Sent Temp").grid(row=10, column=0)
+Label(root, text="Serial Temp").grid(row=10, column=0)
 Label(root, text="Actual Temp").grid(row=11, column=0)
 #Entrys
-xVal1AEntry = Entry().grid(row=1, column=1)
-xVal2AEntry = Entry().grid(row=4, column=1)
-xVal3AEntry = Entry().grid(row=7, column=1)
-xVal4AEntry = Entry().grid(row=10, column=1)
+xVal1AEntry = Entry(root)#.grid(row=1, column=1)
+xVal2AEntry = Entry(root)#.grid(row=4, column=1)
+xVal3AEntry = Entry(root)#.grid(row=7, column=1)
+xVal4AEntry = Entry(root)#.grid(row=10, column=1)
 
-yVal1AEntry = Entry().grid(row=2, column=1)
-yVal2AEntry = Entry().grid(row=5, column=1)
-yVal3AEntry = Entry().grid(row=8, column=1)
-yVal4AEntry = Entry().grid(row=11, column=1)
+xVal1AEntry.grid(row=1, column=1)
+xVal2AEntry.grid(row=4, column=1)
+xVal3AEntry.grid(row=7, column=1)
+xVal4AEntry.grid(row=10, column=1)
 
+yVal1AEntry = Entry(root)#.grid(row=2, column=1)
+yVal2AEntry = Entry(root)#.grid(row=5, column=1)
+yVal3AEntry = Entry(root)#.grid(row=8, column=1)
+yVal4AEntry = Entry(root)#.grid(row=11, column=1)
+
+yVal1AEntry.grid(row=2, column=1)
+yVal2AEntry.grid(row=5, column=1)
+yVal3AEntry.grid(row=8, column=1)
+yVal4AEntry.grid(row=11, column=1)
                         #B Temps
 #Labels
 Label(root, text="B Temps").grid(row=0, column=4)
-Label(root, text="Sent Temp").grid(row=1, column=3)
+Label(root, text="Serial Temp").grid(row=1, column=3)
 Label(root, text="Actual Temp").grid(row=2, column=3)
-Label(root, text="Sent Temp").grid(row=4, column=3)
+Label(root, text="Serial Temp").grid(row=4, column=3)
 Label(root, text="Actual Temp").grid(row=5, column=3)
-Label(root, text="Sent Temp").grid(row=7, column=3)
+Label(root, text="Serial Temp").grid(row=7, column=3)
 Label(root, text="Actual Temp").grid(row=8, column=3)
-Label(root, text="Sent Temp").grid(row=10, column=3)
+Label(root, text="Serial Temp").grid(row=10, column=3)
 Label(root, text="Actual Temp").grid(row=11, column=3)
 #Entrys
-xVal1BEntry = Entry().grid(row=1, column=4)
-xVal2BEntry = Entry().grid(row=4, column=4)
-xVal3BEntry = Entry().grid(row=7, column=4)
-xVal4BEntry = Entry().grid(row=10, column=4)
+xVal1BEntry = Entry(root).grid(row=1, column=4)
+xVal2BEntry = Entry(root).grid(row=4, column=4)
+xVal3BEntry = Entry(root).grid(row=7, column=4)
+xVal4BEntry = Entry(root).grid(row=10, column=4)
 
-yVal1BEntry = Entry().grid(row=2, column=4)
-yVal2BEntry = Entry().grid(row=5, column=4)
-yVal3BEntry = Entry().grid(row=8, column=4)
-yVal4BEntry = Entry().grid(row=11, column=4)
+yVal1BEntry = Entry(root).grid(row=2, column=4)
+yVal2BEntry = Entry(root).grid(row=5, column=4)
+yVal3BEntry = Entry(root).grid(row=8, column=4)
+yVal4BEntry = Entry(root).grid(row=11, column=4)
 
 f = open("CalibratedValues.txt","w+")
 
+try:
+    firstLine = lines[0]
+except Exception as e:
+    print(e)
+    lines = ["0\n", "0\n", "1\n", "0\n"]
+    print(lines)
+
+'''
 connectingPortID = input("Please type the number of the port you would like to use: ")
 connectingPort = PortsAvailable[int(connectingPortID)]
 #write the wanted port to the config file
@@ -103,7 +126,78 @@ try:
 except:
     print("port exception")
     lines = [(str(connectingPortID) + "\n")]
+'''
 
+def calibrate_Command():
+    xVal1A = xVal1AEntry.get()
+    xVal2A = xVal2AEntry.get()
+    xVal3A = xVal3AEntry.get()
+    xVal4A = xVal4AEntry.get()
+
+    yVal1A = yVal1AEntry.get()
+    yVal2A = yVal2AEntry.get()
+    yVal3A = yVal3AEntry.get()
+    yVal4A = yVal4AEntry.get()
+
+    ymA = np.array([yVal1A, yVal2A, yVal3A, yVal4A])
+    xmA = np.array([xVal1A, xVal2A, xVal3A, xVal4A])
+
+    print(xmA)
+    print(ymA)
+
+    A = GEKKO()
+
+    x = A.Param(value=xmA)
+
+    a = A.FV()
+    b = A.FV()
+    c = A.FV()
+
+    a.STATUS = 1
+    b.STATUS = 1
+    c.STATUS = 1
+
+    y = A.CV(value=ymA)
+    y.FSTATUS = 1
+
+    A.Equation(y==a*(x*x) + b*x + c)
+
+    A.options.IMODE = 2
+
+    A.solve(disp=False)
+
+    print(a.Value[0])
+    print(b.Value[0])
+    print(c.Value[0])
+    #write the equation vars to config file
+
+
+    try:
+
+        lines[1] = (str(a.Value[0]) + "\n")
+        lines[2] = (str(b.Value[0]) + "\n")
+        lines[3] = (str(c.Value[0]) + "\n")
+        print(lines)
+
+    except Exception as e:
+        #print(e)
+        lines.append(str(a.Value[0]) + "\n")
+        lines.append(str(b.Value[0]) + "\n")
+        lines.append(str(c.Value[0]) + "\n")
+        print(lines)
+        '''
+        f.write(str(a.Value[0]) + "\n")
+        f.write(str(b.Value[0]) + "\n")
+        f.write(str(c.Value[0]) + "\n")
+    '''
+    f.writelines(lines)
+    f.close()
+
+calibrateButton = Button(root, text="Calibrate", command=calibrate_Command)
+calibrateButton.grid(row=13, column=3)
+
+root.mainloop()
+'''
 yVal1A = input('Please manually set to new temperature, then input what is displayed on device after stabilization: ')
 xVal1A = input('Type what is being sent over serial: ')
 
@@ -154,15 +248,16 @@ try:
     lines[3] = (str(c.Value[0]) + "\n")
 
 except Exception as e:
-    print(e)
+    #print(e)
     lines.append(str(a.Value[0]) + "\n")
     lines.append(str(b.Value[0]) + "\n")
     lines.append(str(c.Value[0]) + "\n")
-    '''
+
     f.write(str(a.Value[0]) + "\n")
     f.write(str(b.Value[0]) + "\n")
     f.write(str(c.Value[0]) + "\n")
-'''
+
 f.writelines(lines)
 f.close()
+'''
 

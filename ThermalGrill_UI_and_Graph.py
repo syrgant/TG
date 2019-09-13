@@ -166,7 +166,8 @@ averageTkvar = StringVar(root)
 try:
     averageTkvar.set(avg)
 except Exception as e:
-    print(e)
+    #print(e)
+    pass
 
 #make dropdown and label
 averageMenu = OptionMenu(graphFrame, averageTkvar, *averageArray)
@@ -279,8 +280,8 @@ calibrateButton.grid(row=1, column=1)
 def animate(i):
     try:
         avgNum2 = avgNum.get(timeout=0)
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
     a.autoscale(enable=False, axis='x')
     try:
@@ -343,8 +344,8 @@ def animate(i):
             a.set(xlim=(len(AVals) - 40, len(AVals)))
         else:
             a.set(xlim=(0, 40))
-    except:
-        pass
+    except Exception as e:
+        print()
 
     try:
         setB = desiredB.get(timeout=0)
@@ -428,5 +429,6 @@ painVar.trace('w', sliderChanged)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
+
 
 

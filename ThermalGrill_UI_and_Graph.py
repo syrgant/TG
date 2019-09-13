@@ -33,18 +33,25 @@ global tempsChanged
 try:
     calFile = open("CalibratedValues.txt", "r")
     lines = calFile.readlines()
+    print(lines)
 
     aCal = float((lines[1])[0:6])
     bCal = float((lines[2])[0:6])
     cCal = float((lines[3])[0:6])
-    avg = float(lines[4])
+    #avg = float(lines[4])
 
     calFile.close()
-except:
-    print("no calibration file found, using default values")
+except Exception as e:
+    print(e)
+    #print("no calibration file found, using default values")
     aCal = 0
     bCal = 1
     cCal = 0
+
+try:
+    avg = float(lines[4])
+except:
+    pass
 
 #print the calibrated values fr0m the file
 print(aCal)
@@ -154,6 +161,17 @@ Label(buttonFrame, text="Choose a port").grid(row=2, column=1)
 #what happens when you change selection
 def change_port(*args):
     #print( serialTkvar.get() )
+    calFile = open("CalibratedValues.txt", 'w')
+    for i in range(len(PortsAvailableArray) + 1):
+        if PortsAvailableArray[i-1] == serialTkvar.get():
+            try:
+                lines[0] = str(i-1)
+            except:
+                lines = [str(i-1)]
+
+    #lines[0] = serialTkvar.get()
+    calFile.writelines(lines)
+    calFile.close()
     pass
 
 #link dropdown to change function

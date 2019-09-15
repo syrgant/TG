@@ -98,23 +98,34 @@ Label(root, text="Actual Temp").grid(row=8, column=3)
 Label(root, text="Serial Temp").grid(row=10, column=3)
 Label(root, text="Actual Temp").grid(row=11, column=3)
 #Entrys
-xVal1BEntry = Entry(root).grid(row=1, column=4)
-xVal2BEntry = Entry(root).grid(row=4, column=4)
-xVal3BEntry = Entry(root).grid(row=7, column=4)
-xVal4BEntry = Entry(root).grid(row=10, column=4)
+xVal1BEntry = Entry(root)
+xVal2BEntry = Entry(root)
+xVal3BEntry = Entry(root)
+xVal4BEntry = Entry(root)
 
-yVal1BEntry = Entry(root).grid(row=2, column=4)
-yVal2BEntry = Entry(root).grid(row=5, column=4)
-yVal3BEntry = Entry(root).grid(row=8, column=4)
-yVal4BEntry = Entry(root).grid(row=11, column=4)
+xVal1BEntry.grid(row=1, column=4)
+xVal2BEntry.grid(row=4, column=4)
+xVal3BEntry.grid(row=7, column=4)
+xVal4BEntry.grid(row=10, column=4)
+
+yVal1BEntry = Entry(root)
+yVal2BEntry = Entry(root)
+yVal3BEntry = Entry(root)
+yVal4BEntry = Entry(root)
+
+yVal1BEntry.grid(row=2, column=4)
+yVal2BEntry.grid(row=5, column=4)
+yVal3BEntry.grid(row=8, column=4)
+yVal4BEntry.grid(row=11, column=4)
 
 f = open("CalibratedValues.txt","w+")
 
 try:
     firstLine = lines[0]
+    print(firstline)
 except Exception as e:
     print(e)
-    lines = ["0\n", "0\n", "1\n", "0\n"]
+    lines = ["0\n", "0\n", "1\n", "0\n", "1\n", "0\n", "1\n", "0\n"]
     print(lines)
 
 '''
@@ -138,9 +149,22 @@ def calibrate_Command():
     yVal2A = yVal2AEntry.get()
     yVal3A = yVal3AEntry.get()
     yVal4A = yVal4AEntry.get()
+    
+    xVal1B = xVal1BEntry.get()
+    xVal2B = xVal2BEntry.get()
+    xVal3B = xVal3BEntry.get()
+    xVal4B = xVal4BEntry.get()
+
+    yVal1B = yVal1BEntry.get()
+    yVal2B = yVal2BEntry.get()
+    yVal3B = yVal3BEntry.get()
+    yVal4B = yVal4BEntry.get()
 
     ymA = np.array([yVal1A, yVal2A, yVal3A, yVal4A])
     xmA = np.array([xVal1A, xVal2A, xVal3A, xVal4A])
+    
+    ymB = np.array([yVal1B, yVal2B, yVal3B, yVal4B])
+    xmB = np.array([xVal1B, xVal2B, xVal3B, xVal4B])
 
     print(xmA)
     print(ymA)
@@ -169,6 +193,35 @@ def calibrate_Command():
     print(a.Value[0])
     print(b.Value[0])
     print(c.Value[0])
+    
+    print(xmB)
+    print(ymB)
+    
+    B = GEKKO()
+
+    i = B.Param(value=xmB)
+
+    q = B.FV()
+    r = B.FV()
+    t = B.FV()
+
+    q.STATUS = 1
+    r.STATUS = 1
+    t.STATUS = 1
+
+    d = B.CV(value=ymB)
+    d.FSTATUS = 1
+
+    B.Equation(y==q*(x*x) + r*x + t)
+
+    B.options.IMODE = 2
+
+    B.solve(disp=False)
+
+    print(q.Value[0])
+    print(r.Value[0])
+    print(t.Value[0])
+    
     #write the equation vars to config file
 
 
@@ -177,6 +230,10 @@ def calibrate_Command():
         lines[1] = (str(a.Value[0]) + "\n")
         lines[2] = (str(b.Value[0]) + "\n")
         lines[3] = (str(c.Value[0]) + "\n")
+        
+        lines[5] = (str(q.Value[0]) + "\n")
+        lines[6] = (str(r.Value[0]) + "\n")
+        lines[7] = (str(t.Value[0]) + "\n")
         print(lines)
 
     except Exception as e:
@@ -184,6 +241,12 @@ def calibrate_Command():
         lines.append(str(a.Value[0]) + "\n")
         lines.append(str(b.Value[0]) + "\n")
         lines.append(str(c.Value[0]) + "\n")
+        
+        lines.append("1\n")
+        
+        lines.append(str(q.Value[0]) + "\n")
+        lines.append(str(r.Value[0]) + "\n")
+        lines.append(str(t.Value[0]) + "\n")
         print(lines)
         '''
         f.write(str(a.Value[0]) + "\n")

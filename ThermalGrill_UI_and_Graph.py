@@ -20,9 +20,13 @@ from matplotlib import style
 style.use("ggplot")
 
 #get the calibrated equation from the file
-global aCal
-global bCal
-global cCal
+global aCalA
+global bCalA
+global cCalA
+
+global aCalB
+global bCalB
+global cCalB
 
 averageArray = [0, 1, 2, 3, 4, 5]
 
@@ -35,28 +39,40 @@ try:
     lines = calFile.readlines()
     print(lines)
 
-    aCal = float((lines[1])[0:6])
-    bCal = float((lines[2])[0:6])
-    cCal = float((lines[3])[0:6])
+    aCalA = float((lines[1])[0:6])
+    bCalA = float((lines[2])[0:6])
+    cCalA = float((lines[3])[0:6])
+    
+    aCalB = float((lines[5])[0:6])
+    bCalB = float((lines[6])[0:6])
+    cCalB = float((lines[7])[0:6])
     #avg = float(lines[4])
 
     calFile.close()
 except Exception as e:
     print(e)
     #print("no calibration file found, using default values")
-    aCal = 0
-    bCal = 1
-    cCal = 0
+    aCalA = 0
+    bCalA = 1
+    cCalA = 0
+    
+    aCalB = 0
+    bCalB = 1
+    cCalB = 0
 
 try:
     avg = float(lines[4])
 except:
     pass
 
-#print the calibrated values fr0m the file
-print(aCal)
-print(bCal)
-print(cCal)
+#print the calibrated values from the file
+print(aCalA)
+print(bCalA)
+print(cCalA)
+
+print(aCalB)
+print(bCalB)
+print(cCalB)
 
 global avgNum
 avgNum = queue.Queue()
@@ -167,7 +183,8 @@ def change_port(*args):
             try:
                 lines[0] = str(i-1)
             except:
-                lines = [str(i-1)]
+                lines = [str(i) + "\n"]
+                print(lines)
 
     #lines[0] = serialTkvar.get()
     calFile.writelines(lines)
@@ -312,7 +329,7 @@ def animate(i):
             x = s[2:9]
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
-                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                newVal = aCalA*((float(x[2:6]))*(float(x[2:6]))) + bCalA*(float(x[2:6])) + cCalA
                 try:
                     testNum = AVals[len(AVals)-i]
                     getAvg = true
@@ -326,7 +343,7 @@ def animate(i):
 
                 AVals.append(newVal)
             elif x[0] == 'B':
-                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                newVal = aCalB*((float(x[2:6]))*(float(x[2:6]))) + bCalB*(float(x[2:6])) + cCalB
                 try:
                     testNum = BVals[len(BVals)-i]
                     getAvg = true
@@ -348,10 +365,10 @@ def animate(i):
 
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
-                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                newVal = aCalA*((float(x[2:6]))*(float(x[2:6]))) + bCalA*(float(x[2:6])) + cCalA
                 AVals.append(newVal)
             elif x[0] == 'B':
-                newVal = aCal*((float(x[2:6]))*(float(x[2:6]))) + bCal*(float(x[2:6])) + cCal
+                newVal = aCalB*((float(x[2:6]))*(float(x[2:6]))) + bCalB*(float(x[2:6])) + cCalB
                 BVals.append(newVal)
 
         a.clear()

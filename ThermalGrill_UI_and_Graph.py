@@ -42,7 +42,7 @@ try:
     aCalA = float((lines[1])[0:6])
     bCalA = float((lines[2])[0:6])
     cCalA = float((lines[3])[0:6])
-    
+
     aCalB = float((lines[5])[0:6])
     bCalB = float((lines[6])[0:6])
     cCalB = float((lines[7])[0:6])
@@ -50,12 +50,12 @@ try:
 
     calFile.close()
 except Exception as e:
-    print(e)
+    #print(e)
     #print("no calibration file found, using default values")
     aCalA = 0
     bCalA = 1
     cCalA = 0
-    
+
     aCalB = 0
     bCalB = 1
     cCalB = 0
@@ -99,7 +99,9 @@ global desiredB
 #define functions to get last V sent and not repeat if same
 global globOut
 try:
-    print(globOut.get(timeout=0))
+    #print(globOut.get(timeout=0))
+    globOut.get(timeout=0)
+
 except:
     globOut = queue.Queue()
 
@@ -124,14 +126,16 @@ canvas.get_tk_widget().grid(row=0, column=0)
 
 #deal with serial connection queues
 try:
-    print(ser)
+    #print(ser)
+    test = ser
 except:
     ser = serial.Serial()
 
 global serc
 
 try:
-    print(serc.get(timeout=0))
+    #print(serc.get(timeout=0))
+    serc.get(timeout=0)
 except:
     serc = queue.Queue()
     serc.put(ser)
@@ -184,7 +188,7 @@ def change_port(*args):
                 lines[0] = str(i-1)
             except:
                 lines = [str(i) + "\n"]
-                print(lines)
+                #print(lines)
 
     #lines[0] = serialTkvar.get()
     calFile.writelines(lines)
@@ -316,7 +320,8 @@ def animate(i):
     try:
         avgNum2 = avgNum.get(timeout=0)
     except Exception as e:
-        print(e)
+        #print(e)
+        pass
 
     a.autoscale(enable=False, axis='x')
     try:
@@ -375,12 +380,16 @@ def animate(i):
         a.plot(AVals, "b")
         a.plot(BVals, "r")
 
+        print("A:" + str(AVals[len(AVals)]))
+        print("B:" + str(BVals[len(BVals)]))
+
         if len(AVals) > 39:
             a.set(xlim=(len(AVals) - 40, len(AVals)))
         else:
             a.set(xlim=(0, 40))
     except Exception as e:
-        print()
+        pass
+        #print()
 
     try:
         setB = desiredB.get(timeout=0)
@@ -455,7 +464,8 @@ def sliderChanged(*args):
         changedA()
         changedB()
     except Exception as e:
-        print(e)
+        #print(e)
+        pass
 
 aEntry.bind('<Return>', changedA)
 bEntry.bind('<Return>', changedB)

@@ -312,6 +312,7 @@ def Calibrate():
     #subprocess.call(["python3", "Calibrate.py"])
     os.system("python3 Calibrate.py")
 
+
 #make calibrate button
 calibrateButton = Button(buttonFrame, text="Calibrate", command=Calibrate)
 calibrateButton.grid(row=1, column=1)
@@ -474,6 +475,3 @@ painVar.trace('w', sliderChanged)
 
 ani = animation.FuncAnimation(f,animate, interval=500)
 root.mainloop()
-
-
-

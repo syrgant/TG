@@ -149,7 +149,7 @@ def calibrate_Command():
     yVal2A = yVal2AEntry.get()
     yVal3A = yVal3AEntry.get()
     yVal4A = yVal4AEntry.get()
-    
+
     xVal1B = xVal1BEntry.get()
     xVal2B = xVal2BEntry.get()
     xVal3B = xVal3BEntry.get()
@@ -162,7 +162,7 @@ def calibrate_Command():
 
     ymA = np.array([yVal1A, yVal2A, yVal3A, yVal4A])
     xmA = np.array([xVal1A, xVal2A, xVal3A, xVal4A])
-    
+
     ymB = np.array([yVal1B, yVal2B, yVal3B, yVal4B])
     xmB = np.array([xVal1B, xVal2B, xVal3B, xVal4B])
 
@@ -193,10 +193,10 @@ def calibrate_Command():
     print(a.Value[0])
     print(b.Value[0])
     print(c.Value[0])
-    
+
     print(xmB)
     print(ymB)
-    
+
     B = GEKKO()
 
     i = B.Param(value=xmB)
@@ -221,7 +221,7 @@ def calibrate_Command():
     print(q.Value[0])
     print(r.Value[0])
     print(t.Value[0])
-    
+
     #write the equation vars to config file
 
 
@@ -230,7 +230,7 @@ def calibrate_Command():
         lines[1] = (str(a.Value[0]) + "\n")
         lines[2] = (str(b.Value[0]) + "\n")
         lines[3] = (str(c.Value[0]) + "\n")
-        
+
         lines[5] = (str(q.Value[0]) + "\n")
         lines[6] = (str(r.Value[0]) + "\n")
         lines[7] = (str(t.Value[0]) + "\n")
@@ -241,9 +241,9 @@ def calibrate_Command():
         lines.append(str(a.Value[0]) + "\n")
         lines.append(str(b.Value[0]) + "\n")
         lines.append(str(c.Value[0]) + "\n")
-        
+
         lines.append("1\n")
-        
+
         lines.append(str(q.Value[0]) + "\n")
         lines.append(str(r.Value[0]) + "\n")
         lines.append(str(t.Value[0]) + "\n")
@@ -255,6 +255,9 @@ def calibrate_Command():
     '''
     f.writelines(lines)
     f.close()
+
+    print("success!")
+    root.destroy()
 
 calibrateButton = Button(root, text="Calibrate", command=calibrate_Command)
 calibrateButton.grid(row=13, column=3)
@@ -323,4 +326,3 @@ except Exception as e:
 f.writelines(lines)
 f.close()
 '''
-

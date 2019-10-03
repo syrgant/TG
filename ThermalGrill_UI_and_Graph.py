@@ -336,30 +336,17 @@ def animate(i):
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
                 newVal = aCalA*((float(x[2:6]))*(float(x[2:6]))) + bCalA*(float(x[2:6])) + cCalA
-                try:
-                    testNum = AVals[len(AVals)-i]
-                    getAvg = true
-                except:
-                    getAvg=false
 
-                if getAvg:
-                    for i in avgNum2:
-                        newVal = newVal + AVals[len(AVals)-i]
-                    newVal = newVal/avgNums2
+                if(len(AVals) >= 3):
+                    newVal = ((newVal + AVals[len(AVals)-2] + AVals[len(AVals)-3] + AVals[len(AVals)-4])/4)
 
                 AVals.append(newVal)
             elif x[0] == 'B':
                 newVal = aCalB*((float(x[2:6]))*(float(x[2:6]))) + bCalB*(float(x[2:6])) + cCalB
-                try:
-                    testNum = BVals[len(BVals)-i]
-                    getAvg = true
-                except:
-                    getAvg=false
 
-                if getAvg:
-                    for i in avgNum2:
-                        newVal = newVal + BVals[len(BVals)-i]
-                    newVal = newVal/avgNums2
+                if(len(BVals) >= 3):
+                    newVal = ((newVal + BVals[len(BVals)-2] + BVals[len(BVals)-3] + BVals[len(BVals)-4])/4)
+
                 BVals.append(newVal)
 
         while not len(AVals) == len(BVals):
@@ -372,14 +359,21 @@ def animate(i):
             #check to see if it's an A or B value, and append to correct dictionary
             if x[0] == 'A':
                 newVal = aCalA*((float(x[2:6]))*(float(x[2:6]))) + bCalA*(float(x[2:6])) + cCalA
+                if(len(AVals) >= 3):
+                    newVal = ((newVal + AVals[len(AVals)-2] + AVals[len(AVals)-3] + AVals[len(AVals)-4])/4)
                 AVals.append(newVal)
             elif x[0] == 'B':
                 newVal = aCalB*((float(x[2:6]))*(float(x[2:6]))) + bCalB*(float(x[2:6])) + cCalB
+                if(len(BVals) >= 3):
+                    newVal = ((newVal + BVals[len(BVals)-2] + BVals[len(BVals)-3] + BVals[len(BVals)-4])/4)
                 BVals.append(newVal)
 
         a.clear()
         a.plot(AVals, "b")
         a.plot(BVals, "r")
+
+        if(len(AVals) >= 25):
+            a.xlim(len(AVals)-24, len(AVals))
 
         print("A:" + str(AVals[len(AVals)]))
         print("B:" + str(BVals[len(BVals)]))

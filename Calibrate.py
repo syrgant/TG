@@ -122,10 +122,10 @@ f = open("CalibratedValues.txt","w+")
 
 try:
     firstLine = lines[0]
-    print(firstline)
+    print(firstLine)
 except Exception as e:
     print(e)
-    lines = ["0\n", "0\n", "1\n", "0\n", "1\n", "0\n", "1\n", "0\n"]
+    lines = ["0\n", "0\n", "1\n", "0\n", "0\n", "1\n", "0\n"]
     print(lines)
 
 '''
@@ -231,9 +231,9 @@ def calibrate_Command():
         lines[2] = (str(b.Value[0]) + "\n")
         lines[3] = (str(c.Value[0]) + "\n")
 
-        lines[5] = (str(q.Value[0]) + "\n")
-        lines[6] = (str(r.Value[0]) + "\n")
-        lines[7] = (str(t.Value[0]) + "\n")
+        lines[4] = (str(q.Value[0]) + "\n")
+        lines[5] = (str(r.Value[0]) + "\n")
+        lines[6] = (str(t.Value[0]) + "\n")
         print(lines)
 
     except Exception as e:
@@ -241,8 +241,6 @@ def calibrate_Command():
         lines.append(str(a.Value[0]) + "\n")
         lines.append(str(b.Value[0]) + "\n")
         lines.append(str(c.Value[0]) + "\n")
-
-        lines.append("1\n")
 
         lines.append(str(q.Value[0]) + "\n")
         lines.append(str(r.Value[0]) + "\n")

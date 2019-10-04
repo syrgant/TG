@@ -43,9 +43,9 @@ try:
     bCalA = float((lines[2])[0:6])
     cCalA = float((lines[3])[0:6])
 
-    aCalB = float((lines[5])[0:6])
-    bCalB = float((lines[6])[0:6])
-    cCalB = float((lines[7])[0:6])
+    aCalB = float((lines[4])[0:6])
+    bCalB = float((lines[5])[0:6])
+    cCalB = float((lines[6])[0:6])
     #avg = float(lines[4])
 
     calFile.close()
@@ -59,11 +59,6 @@ except Exception as e:
     aCalB = 0
     bCalB = 1
     cCalB = 0
-
-try:
-    avg = float(lines[4])
-except:
-    pass
 
 #print the calibrated values from the file
 print(aCalA)
@@ -119,6 +114,7 @@ f = Figure(figsize=(5,5), dpi=100)
 a = f.add_subplot(111)
 a.set(ylim=(0, 50), xlim=(0, 25))
 a.autoscale(enable=False, axis='x')
+a.autoscale(enable=False, axis='y')
 
 canvas = FigureCanvasTkAgg(f, graphFrame)
 canvas.draw()
@@ -185,9 +181,9 @@ def change_port(*args):
     for i in range(len(PortsAvailableArray) + 1):
         if PortsAvailableArray[i-1] == serialTkvar.get():
             try:
-                lines[0] = str(i-1)
+                lines[0] = (str(i-1) + "\n")
             except:
-                lines = [str(i) + "\n"]
+                lines = [str(i-1) + "\n"]
                 #print(lines)
 
     #lines[0] = serialTkvar.get()
@@ -197,44 +193,6 @@ def change_port(*args):
 
 #link dropdown to change function
 serialTkvar.trace('w', change_port)
-
-                                    #Make the averaging dropdown
-averageTkvar = StringVar(root)
-
-#set the default value
-try:
-    averageTkvar.set(avg)
-except Exception as e:
-    #print(e)
-    pass
-
-#make dropdown and label
-averageMenu = OptionMenu(graphFrame, averageTkvar, *averageArray)
-averageMenu.grid(row=3, column=0)
-Label(graphFrame, text="Number of Prev. Values for Average").grid(row=2, column=0)
-
-#what happens when you change selection
-def change_av(*args):
-    print( averageTkvar.get() )
-    calFile = open("CalibratedValues.txt", "w")
-    try:
-        lines[4] = (str(averageTkvar.get()) + "\n")
-    except:
-        lines.append(str(averageTkvar.get()) + "\n")
-
-    try:
-        avgNum.get(timeout=0)
-    except:
-        pass
-
-    avgNum.put(averageTkvar.get())
-    #calFile.write(averageTkvar.get() + "\n")
-    calFile.writelines(lines)
-    calFile.close()
-    #pass
-
-#link dropdown to change function
-averageTkvar.trace('w', change_av)
 
 #make slider for the pain "levels"
 painVar = StringVar(root)
@@ -378,13 +336,16 @@ def animate(i):
         print("A:" + str(AVals[len(AVals)]))
         print("B:" + str(BVals[len(BVals)]))
 
-        if len(AVals) > 39:
-            a.set(xlim=(len(AVals) - 40, len(AVals)))
-        else:
-            a.set(xlim=(0, 40))
     except Exception as e:
         pass
         #print()
+
+    if len(AVals) > 49:
+        a.set_xlim(left=len(AVals) - 50, right=len(AVals))
+        a.set_ylim(0, 50)
+    else:
+        a.set_xlim(0, 50)
+        a.set_ylim(0, 50)
 
     try:
         setB = desiredB.get(timeout=0)

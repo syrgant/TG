@@ -28,6 +28,10 @@ global aCalB
 global bCalB
 global cCalB
 
+AValData = []
+BValData = []
+DiscomfortData = []
+
 try:
     manTemp = manualTemp.get(timeout=0)
     manualTemp.put(manTemp)
@@ -202,12 +206,31 @@ def change_port(*args):
 #link dropdown to change function
 serialTkvar.trace('w', change_port)
 
+#port tkinter variable
+discTkvar = StringVar(root)
+
+#make drop down and label
+discMenu = OptionMenu(buttonFrame, discTkvar, *range(10))
+discMenu.grid(row=5, column=1)
+Label(buttonFrame, text="Level of Discomfort").grid(row=5, column=0)
+
+#what happens when you change selection
+def change_Discomfort(*args):
+    try:
+        AValData = AVals[len(AVals)]
+        BValData = AVals[len(AVals)]
+        DiscomfortData = discTkvar.get()
+    except Exception as e:
+        print(e)
+#link dropdown to change function
+discTkvar.trace('w', change_Discomfort)
+
 #make slider for the pain "levels"
 painVar = StringVar(root)
 
 painScale = Scale(buttonFrame, from_=0, to_=10, orient = 'horizontal', variable = painVar)
 painScale.grid(row=1, column=5)
-Label(buttonFrame, text="Pain Level").grid(row=0, column=5)
+Label(buttonFrame, text="Set Pain Level").grid(row=0, column=5)
 
 def start_graph():
     ser = serial.Serial(
@@ -246,8 +269,8 @@ def four_dig(input):
 
 try:
     if tempsChanged == False:
-        desiredA.put(23)
-        desiredB.put(23)
+        desiredA.put(27)
+        desiredB.put(27)
         tempsChanged = True
 except Exception as e:
     #print(e)
@@ -255,11 +278,11 @@ except Exception as e:
     aEntry.delete(0, last=None)
     bEntry.delete(0, last=None)
 
-    aEntry.insert(0, "23")
-    bEntry.insert(0, "23")
+    aEntry.insert(0, "27")
+    bEntry.insert(0, "27")
 
-    desiredA.put(23)
-    desiredB.put(23)
+    desiredA.put(27)
+    desiredB.put(27)
 
 #make start button
 startButton = Button(buttonFrame, text="Start", command=start_graph)
@@ -280,8 +303,8 @@ def setCold():
     aEntry.delete(0, "end")
     bEntry.delete(0, "end")
 
-    aEntry.insert(0, "20")
-    bEntry.insert(0, "20")
+    aEntry.insert(0, "10")
+    bEntry.insert(0, "10")
 
     changedA()
     changedB()
@@ -314,8 +337,7 @@ def setTG():
     aEntry.delete(0, "end")
     bEntry.delete(0, "end")
 
-    aEntry.insert(0, "40")
-    bEntry.insert(0, "20")
+    painScale.set(7)
 
     changedA()
     changedB()
@@ -475,8 +497,8 @@ def sliderChanged(*args):
             aEntry.delete(0, "end")
             bEntry.delete(0, "end")
 
-            aEntry.insert(0, str(23 + int(round(float(painVar.get())*(17/10)))))
-            bEntry.insert(0, str(23 - int(round(float(painVar.get())*(17/10)))))
+            aEntry.insert(0, str(27 + int(round(float(painVar.get())*(17/10)))))
+            bEntry.insert(0, str(27 - int(round(float(painVar.get())*(17/10)))))
 
             changedA()
             changedB()

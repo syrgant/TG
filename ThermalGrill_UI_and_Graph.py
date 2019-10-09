@@ -4,10 +4,12 @@ import serial
 import time
 import datetime
 import serial.tools.list_ports
+from tkinter import filedialog
 from tkinter import *
 import _thread
 import matplotlib.animation as animation
 import matplotlib
+import csv
 #set the backend to use and import navigation bar
 matplotlib.use("TkAgg")
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -86,7 +88,7 @@ avgNum = queue.Queue()
 
 root = Tk()
 
-root.geometry("600x670")
+root.geometry("600x750")
 
 #make frames for maneagement
 buttonFrame = Frame(root)
@@ -217,9 +219,9 @@ Label(buttonFrame, text="Level of Discomfort").grid(row=5, column=0)
 #what happens when you change selection
 def change_Discomfort(*args):
     try:
-        AValData = AVals[len(AVals)]
-        BValData = AVals[len(AVals)]
-        DiscomfortData = discTkvar.get()
+        AValData.append(AVals[len(AVals)-1])
+        BValData.append(AVals[len(AVals)-1])
+        DiscomfortData.append(discTkvar.get())
     except Exception as e:
         print(e)
 #link dropdown to change function
@@ -244,6 +246,11 @@ def start_graph():
     )
     print("starting")
     serc.put(ser)
+
+    if tempsChanged == False:
+        desiredA.put(27)
+        desiredB.put(27)
+        tempsChanged = True
 
 #program to make the numbers 4 digits
 
@@ -345,6 +352,23 @@ def setTG():
 #make reset button
 TGButton = Button(buttonFrame, text="Thermal Grill", command=setTG)
 TGButton.grid(row=4, column=2)
+
+def Save():
+    filename =  filedialog.asksaveasfilename(initialdir = "",title = "Select file",filetypes = (("CSV files","*.csv"),("Text files","*.txt"),("all files","*.*")))
+
+    with open(filename, mode='w+') as data_file:
+        data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        data_writer.writerow(['A Temp', 'B Temp', 'Level of Discomfort'])
+
+        for i in range(len(DiscomfortData)):
+            print(i)
+            data_writer.writerow([AValData[i], BValData[i], DiscomfortData[i]])
+
+    print (filename)
+
+#make reset button
+SaveButton = Button(graphFrame, text="Save Data to File", command=Save)
+SaveButton.grid(row=1, column=0)
 
 #execute the calibrate script in a terminal
 def Calibrate():

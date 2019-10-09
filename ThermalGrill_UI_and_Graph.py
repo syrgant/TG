@@ -28,6 +28,14 @@ global aCalB
 global bCalB
 global cCalB
 
+try:
+    manTemp = manualTemp.get(timeout=0)
+    manualTemp.put(manTemp)
+except:
+    manualTemp = queue.Queue()
+    manualTemp.put(True)
+
+
 averageArray = [0, 1, 2, 3, 4, 5]
 
 global tempsChanged
@@ -265,6 +273,57 @@ def resetProgram():
 resetButton = Button(buttonFrame, text="Reset", command=resetProgram)
 resetButton.grid(row=3, column=1)
 
+def setCold():
+    manualTemp.get(timeout=0)
+    manualTemp.put(False)
+
+    aEntry.delete(0, "end")
+    bEntry.delete(0, "end")
+
+    aEntry.insert(0, "20")
+    bEntry.insert(0, "20")
+
+    changedA()
+    changedB()
+
+#make reset button
+coldButton = Button(buttonFrame, text="Set Cold", command=setCold)
+coldButton.grid(row=4, column=0)
+
+def setHot():
+    manualTemp.get(timeout=0)
+    manualTemp.put(False)
+
+    aEntry.delete(0, "end")
+    bEntry.delete(0, "end")
+
+    aEntry.insert(0, "40")
+    bEntry.insert(0, "40")
+
+    changedA()
+    changedB()
+
+#make reset button
+hotButton = Button(buttonFrame, text="Set Hot", command=setHot)
+hotButton.grid(row=4, column=1)
+
+def setTG():
+    manualTemp.get(timeout=0)
+    manualTemp.put(True)
+
+    aEntry.delete(0, "end")
+    bEntry.delete(0, "end")
+
+    aEntry.insert(0, "40")
+    bEntry.insert(0, "20")
+
+    changedA()
+    changedB()
+
+#make reset button
+TGButton = Button(buttonFrame, text="Thermal Grill", command=setTG)
+TGButton.grid(row=4, column=2)
+
 #execute the calibrate script in a terminal
 def Calibrate():
     #subprocess.call(["python3", "Calibrate.py"])
@@ -411,14 +470,19 @@ def changedB(event=None):
 
 def sliderChanged(*args):
     try:
-        aEntry.delete(0, "end")
-        bEntry.delete(0, "end")
+        if manualTemp.get(timeout=0) == True:
+            manualTemp.put(True)
+            aEntry.delete(0, "end")
+            bEntry.delete(0, "end")
 
-        aEntry.insert(0, str(23 + int(round(float(painVar.get())*(17/10)))))
-        bEntry.insert(0, str(23 - int(round(float(painVar.get())*(17/10)))))
+            aEntry.insert(0, str(23 + int(round(float(painVar.get())*(17/10)))))
+            bEntry.insert(0, str(23 - int(round(float(painVar.get())*(17/10)))))
 
-        changedA()
-        changedB()
+            changedA()
+            changedB()
+        else:
+            manualTemp.put(False)
+
     except Exception as e:
         #print(e)
         pass
